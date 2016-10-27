@@ -19,7 +19,7 @@ import {
 	fetchConnection,
 	updateSiteConnection,
 } from 'state/sharing/publicize/actions';
-import { errorNotice } from 'state/notices/actions';
+import { errorNotice, successNotice, warningNotice } from 'state/notices/actions';
 import Connection from './connection';
 import FoldableCard from 'components/foldable-card';
 import { getAvailableExternalAccounts } from 'state/sharing/selectors';
@@ -32,7 +32,6 @@ import {
 	isFetchingConnections,
 } from 'state/sharing/publicize/selectors';
 import { getSelectedSiteId } from 'state/ui/selectors';
-import notices from 'notices';
 import observe from 'lib/mixins/data-observe';
 import PopupMonitor from 'lib/popup-monitor';
 import { recordGoogleEvent } from 'state/analytics/actions';
@@ -43,7 +42,6 @@ import ServiceConnectedAccounts from './service-connected-accounts';
 import ServiceDescription from './service-description';
 import ServiceExamples from './service-examples';
 import ServiceTip from './service-tip';
-import { warningNotice } from 'state/notices/actions';
 
 const SharingService = React.createClass( {
 	displayName: 'SharingService',
@@ -335,7 +333,7 @@ const SharingService = React.createClass( {
 		this.setState( { isConnecting: false } );
 		this.props.connections.off( 'create:error', this.onConnectionError );
 
-		notices.success( this.props.translate( 'The %(service)s account was successfully connected.', {
+		this.props.successNotice( this.props.translate( 'The %(service)s account was successfully connected.', {
 			args: { service: this.props.service.label },
 			context: 'Sharing: Publicize connection confirmation'
 		} ) );
@@ -350,18 +348,19 @@ const SharingService = React.createClass( {
 		this.props.connections.off( 'create:success', this.onConnectionSuccess );
 
 		if ( reason && reason.cancel ) {
-			notices.warning( this.props.translate( 'The %(service)s connection could not be made because no account was selected.', {
-				args: { service: this.props.service.label },
-				context: 'Sharing: Publicize connection confirmation'
-			} ) );
+			this.props.warningNotice( this.props.translate(
+				'The %(service)s connection could not be made because no account was selected.', {
+					args: { service: this.props.service.label },
+					context: 'Sharing: Publicize connection confirmation'
+				} ) );
 		} else if ( reason && reason.connected ) {
-			notices.warning( this.props.translate(
+			this.props.warningNotice( this.props.translate(
 				'The %(service)s connection could not be made because all available accounts are already connected.', {
 					args: { service: this.props.service.label },
 					context: 'Sharing: Publicize connection confirmation'
 				} ) );
 		} else {
-			notices.error( this.props.translate( 'The %(service)s connection could not be made.', {
+			this.props.errorNotice( this.props.translate( 'The %(service)s connection could not be made.', {
 				args: { service: this.props.service.label },
 				context: 'Sharing: Publicize connection confirmation'
 			} ) );
@@ -372,7 +371,7 @@ const SharingService = React.createClass( {
 		this.setState( { isDisconnecting: false } );
 		this.props.connections.off( 'destroy:error', this.onDisconnectionError );
 
-		notices.success( this.props.translate( 'The %(service)s account was successfully disconnected.', {
+		this.props.successNotice( this.props.translate( 'The %(service)s account was successfully disconnected.', {
 			args: { service: this.props.service.label },
 			context: 'Sharing: Publicize disconnection confirmation'
 		} ) );
@@ -382,7 +381,7 @@ const SharingService = React.createClass( {
 		this.setState( { isDisconnecting: false } );
 		this.props.connections.off( 'destroy:success', this.onDisconnectionSuccess );
 
-		notices.error( this.props.translate( 'The %(service)s account was unable to be disconnected.', {
+		this.props.errorNotice( this.props.translate( 'The %(service)s account was unable to be disconnected.', {
 			args: { service: this.props.service.label },
 			context: 'Sharing: Publicize disconnection confirmation'
 		} ) );
@@ -392,7 +391,7 @@ const SharingService = React.createClass( {
 		this.setState( { isRefreshing: false } );
 		this.props.connections.off( 'refresh:error', this.onRefreshError );
 
-		notices.success( this.props.translate( 'The %(service)s account was successfully reconnected.', {
+		this.props.successNotice( this.props.translate( 'The %(service)s account was successfully reconnected.', {
 			args: { service: this.props.service.label },
 			context: 'Sharing: Publicize reconnection confirmation'
 		} ) );
@@ -402,7 +401,7 @@ const SharingService = React.createClass( {
 		this.setState( { isRefreshing: false } );
 		this.props.connections.off( 'refresh:success', this.onRefreshSuccess );
 
-		notices.error( this.props.translate( 'The %(service)s account was unable to be reconnected.', {
+		this.props.errorNotice( this.props.translate( 'The %(service)s account was unable to be reconnected.', {
 			args: { service: this.props.service.label },
 			context: 'Sharing: Publicize reconnection confirmation'
 		} ) );
@@ -569,6 +568,7 @@ export default connect(
 		fetchConnection,
 		recordGoogleEvent,
 		requestKeyringConnections,
+		successNotice,
 		updateSiteConnection,
 		warningNotice,
 	},
