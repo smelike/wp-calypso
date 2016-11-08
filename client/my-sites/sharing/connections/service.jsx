@@ -85,7 +85,6 @@ const SharingService = React.createClass( {
 			recordGoogleEvent: () => {},
 			requestKeyringConnections: () => {},
 			removableConnections: [],
-			site: Object.freeze( {} ),
 			siteId: 0,
 			siteUserConnections: [],
 			translate: identity,
@@ -102,21 +101,6 @@ const SharingService = React.createClass( {
 	 */
 	getConnections: function() {
 		return this.filter( 'getConnections', this.props.service.ID, this.props.siteUserConnections, arguments );
-	},
-
-	/**
-	 * Given a service name, returns the connections for which the current user is permitted to remove.
-	 *
-	 * @param {string} service The name of the service
-	 * @return {Array} Connections for which the current user is permitted to remove
-	 */
-	getRemovableConnections: function( service ) {
-		const connections = this.getConnections().filter( ( connection ) => (
-			this.props.site.capabilities && this.props.site.capabilities.edit_others_posts ||
-				connection.user_ID === this.props.userId
-		), this );
-
-		return this.filter( 'getRemovableConnections', service, connections, arguments );
 	},
 
 	/**
@@ -226,7 +210,7 @@ const SharingService = React.createClass( {
 
 		// Depending on current status, perform an action when user clicks the
 		// service action button
-		if ( 'connected' === connectionStatus && this.getRemovableConnections( this.props.service.ID ).length ) {
+		if ( 'connected' === connectionStatus && this.props.removableConnections.length ) {
 			this.disconnect();
 			this.props.recordGoogleEvent( 'Sharing', 'Clicked Disconnect Button', this.props.service.ID );
 		} else if ( 'reconnect' === connectionStatus ) {
@@ -342,7 +326,7 @@ const SharingService = React.createClass( {
 	 * @param {Array} connections Optional. Connections to be deleted.
 	 *                            Default: All connections for this service.
 	 */
-	removeConnection: function( connections = this.getRemovableConnections( this.props.service.ID ) ) {
+	removeConnection: function( connections = this.props.removableConnections ) {
 		this.setState( { isDisconnecting: true } );
 
 		connections = this.filterConnectionsToRemove( connections );
@@ -407,8 +391,7 @@ const SharingService = React.createClass( {
 				onAction={ this.performAction }
 				isConnecting={ this.state.isConnecting }
 				isRefreshing={ this.state.isRefreshing }
-				isDisconnecting={ this.state.isDisconnecting }
-				removableConnections={ this.getRemovableConnections( this.props.service.ID ) } />
+				isDisconnecting={ this.state.isDisconnecting } />
 		);
 
 		return (
