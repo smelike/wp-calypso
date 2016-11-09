@@ -53,7 +53,6 @@ const SharingService = React.createClass( {
 		deleteSiteConnection: PropTypes.func,
 		errorNotice: PropTypes.func,
 		failCreateConnection: PropTypes.func,
-		fetchConnections: PropTypes.func,
 		fetchConnection: PropTypes.func,
 		isFetching: PropTypes.bool,
 		keyringConnections: PropTypes.arrayOf( PropTypes.object ),
@@ -79,7 +78,6 @@ const SharingService = React.createClass( {
 			errorNotice: () => {},
 			failCreateConnection: () => {},
 			fetchConnection: () => {},
-			fetchConnections: () => {},
 			isFetching: false,
 			keyringConnections: [],
 			recordGoogleEvent: () => {},
@@ -250,7 +248,7 @@ const SharingService = React.createClass( {
 				popupMonitor.once( 'close', () => {
 					// When the user has finished authorizing the connection
 					// (or otherwise closed the window), force a refresh
-					this.props.fetchConnections( this.props.siteId );
+					this.props.requestKeyringConnections;
 
 					// In the case that a Keyring connection doesn't exist, wait for app
 					// authorization to occur, then display with the available connections
