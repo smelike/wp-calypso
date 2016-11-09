@@ -19,13 +19,13 @@ import ServicePlaceholder from './service-placeholder';
  */
 const NUMBER_OF_PLACEHOLDERS = 4;
 
-const SharingServicesGroup = ( { connections, services, title } ) => (
+const SharingServicesGroup = ( { services, title } ) => (
 	<div className="sharing-services-group">
 		<SectionHeader label={ title } />
 		<ul className="sharing-services-group__services">
 			{ services.length
 				? services.map( ( service ) => (
-					<Service key={ service.ID } connections={ connections } service={ service } />
+					<Service key={ service.ID } service={ service } />
 				) )
 				: times( NUMBER_OF_PLACEHOLDERS, ( index ) => (
 					<ServicePlaceholder key={ 'service-placeholder-' + index } />
@@ -36,14 +36,12 @@ const SharingServicesGroup = ( { connections, services, title } ) => (
 );
 
 SharingServicesGroup.propTypes = {
-	connections: PropTypes.object,
 	services: PropTypes.array,
 	title: PropTypes.string.isRequired,
 	type: PropTypes.string.isRequired,
 };
 
 SharingServicesGroup.defaultProps = {
-	connections: Object.freeze( {} ),
 	services: Object.freeze( [] ),
 };
 
