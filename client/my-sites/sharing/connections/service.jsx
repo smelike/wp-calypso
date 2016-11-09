@@ -19,11 +19,12 @@ import {
 	fetchConnection,
 	updateSiteConnection,
 } from 'state/sharing/publicize/actions';
-import { errorNotice, successNotice, warningNotice } from 'state/notices/actions';
+import { errorNotice } from 'state/notices/actions';
 import Connection from './connection';
 import FoldableCard from 'components/foldable-card';
 import { getAvailableExternalAccounts } from 'state/sharing/selectors';
 import { getCurrentUserId } from 'state/current-user/selectors';
+import { getKeyringConnectionsByName } from 'state/sharing/keyring/selectors';
 import {
 	getBrokenSiteUserConnectionsForService,
 	getRemovableConnections,
@@ -48,13 +49,14 @@ const SharingService = React.createClass( {
 	propTypes: {
 		availableExternalAccounts: PropTypes.arrayOf( PropTypes.object ),
 		brokenConnections: PropTypes.arrayOf( PropTypes.object ),
-		connections: PropTypes.object.isRequired,   // A collections-list instance
 		createSiteConnection: PropTypes.func,
 		deleteSiteConnection: PropTypes.func,
 		errorNotice: PropTypes.func,
 		failCreateConnection: PropTypes.func,
+		fetchConnections: PropTypes.func,
 		fetchConnection: PropTypes.func,
 		isFetching: PropTypes.bool,
+		keyringConnections: PropTypes.arrayOf( PropTypes.object ),
 		recordGoogleEvent: PropTypes.func,
 		removableConnections: PropTypes.arrayOf( PropTypes.object ),
 		requestKeyringConnections: PropTypes.func,
@@ -64,7 +66,6 @@ const SharingService = React.createClass( {
 		translate: PropTypes.func,
 		updateSiteConnection: PropTypes.func,
 		userId: PropTypes.number,                 // ID of the current user
-		warningNotice: PropTypes.func,
 	},
 
 	mixins: [ observe( 'connections' ) ],
@@ -78,6 +79,7 @@ const SharingService = React.createClass( {
 			errorNotice: () => {},
 			failCreateConnection: () => {},
 			fetchConnection: () => {},
+			fetchConnections: () => {},
 			isFetching: false,
 			keyringConnections: [],
 			recordGoogleEvent: () => {},
@@ -88,7 +90,6 @@ const SharingService = React.createClass( {
 			translate: identity,
 			updateSiteConnection: () => {},
 			userId: 0,
-			warningNotice: () => {},
 		};
 	},
 
@@ -196,11 +197,10 @@ const SharingService = React.createClass( {
 				isSelectingAccount: false,
 			} );
 		}
-	},
 
-	componentWillUnmount: function() {
-		this.props.connections.off( 'refresh:success', this.onRefreshSuccess );
-		this.props.connections.off( 'refresh:error', this.onRefreshError );
+		if ( this.props.brokenConnections.length !== nextProps.brokenConnections.length ) {
+			this.setState( { isRefreshing: false } );
+		}
 	},
 
 	performAction: function() {
@@ -262,7 +262,7 @@ const SharingService = React.createClass( {
 		} else {
 			// If an account wasn't selected from the dialog or the user cancels
 			// the connection, the dialog should simply close
-			this.props.warningNotice( this.props.translate( 'The connection could not be made because no account was selected.', {
+			this.props.errorNotice( this.props.translate( 'The connection could not be made because no account was selected.', {
 				context: 'Sharing: Publicize connection confirmation'
 			} ) );
 			this.props.recordGoogleEvent( 'Sharing', 'Clicked Cancel Button in Modal', this.props.service.ID );
@@ -276,46 +276,37 @@ const SharingService = React.createClass( {
 		this.props.updateSiteConnection( connection, { shared } );
 	},
 
-	refresh: function( connection ) {
-		this.setState( { isRefreshing: true } );
-		this.props.connections.once( 'refresh:success', this.onRefreshSuccess );
-		this.props.connections.once( 'refresh:error', this.onRefreshError );
-
-		if ( ! connection ) {
-			// When triggering a refresh from the primary action button, find
-			// the first broken connection owned by the current user.
-			connection = find( this.getConnections(), { status: 'broken' } );
-		}
-		this.refreshConnection( connection );
-	},
-
-	onRefreshSuccess: function() {
-		this.setState( { isRefreshing: false } );
-		this.props.connections.off( 'refresh:error', this.onRefreshError );
-
-		this.props.successNotice( this.props.translate( 'The %(service)s account was successfully reconnected.', {
-			args: { service: this.props.service.label },
-			context: 'Sharing: Publicize reconnection confirmation'
-		} ) );
-	},
-
-	onRefreshError: function() {
-		this.setState( { isRefreshing: false } );
-		this.props.connections.off( 'refresh:success', this.onRefreshSuccess );
-
-		this.props.errorNotice( this.props.translate( 'The %(service)s account was unable to be reconnected.', {
-			args: { service: this.props.service.label },
-			context: 'Sharing: Publicize reconnection confirmation'
-		} ) );
-	},
-
 	connectAnother() {
 		this.props.recordGoogleEvent( 'Sharing', 'Clicked Connect Another Account Button', this.props.service.ID );
 		this.addConnection( this.props.service );
 	},
 
-	refreshConnection: function( connection ) {
-		this.props.connections.refresh( connection );
+	refresh: function( connections = this.props.brokenConnections ) {
+		this.setState( { isRefreshing: true } );
+
+		connections.map( ( connection ) => {
+			const keyringConnection = find( this.props.keyringConnections, { ID: connection.keyring_connection_ID } );
+
+			if ( keyringConnection ) {
+				// Attempt to create a new connection. If a Keyring connection ID
+				// is not provided, the user will need to authorize the app
+				const popupMonitor = new PopupMonitor();
+
+				popupMonitor.open( connection.refresh_URL, null, 'toolbar=0,location=0,status=0,menubar=0,' +
+					popupMonitor.getScreenCenterSpecs( 780, 500 ) );
+
+				popupMonitor.once( 'close', () => {
+					// When the user has finished authorizing the connection
+					// (or otherwise closed the window), force a refresh
+					this.props.fetchConnection( this.props.siteId, connection );
+				} );
+			} else {
+				this.props.errorNotice( this.props.translate( 'The %(service)s account was unable to be reconnected.', {
+					args: { service: this.props.service.label },
+					context: 'Sharing: Publicize reconnection confirmation'
+				} ) );
+			}
+		} );
 	},
 
 	/**
@@ -439,6 +430,7 @@ export default connect(
 			availableExternalAccounts: getAvailableExternalAccounts( state, service.ID ),
 			brokenConnections: getBrokenSiteUserConnectionsForService( state, siteId, userId, service.ID ),
 			isFetching: isFetchingConnections( state, siteId ),
+			keyringConnections: getKeyringConnectionsByName( state, service.ID ),
 			removableConnections: getRemovableConnections( state, service.ID ),
 			siteId,
 			siteUserConnections: getSiteUserConnectionsForService( state, siteId, userId, service.ID ),
@@ -453,8 +445,6 @@ export default connect(
 		fetchConnection,
 		recordGoogleEvent,
 		requestKeyringConnections,
-		successNotice,
 		updateSiteConnection,
-		warningNotice,
 	},
 )( localize( SharingService ) );
