@@ -247,13 +247,17 @@ UndocumentedSite.prototype.getConnection = function( connectionId ) {
 /**
  * Runs Theme Setup (Headstart).
  *
- * @param  {Number}  connectionId The connection ID to get.
- * @return {Promise}              A Promise to resolve when complete.
+ * @param  {Boolean}  saveExisting Whether or not to keep existing site content.
+ * @return {Promise}               A Promise to resolve when complete.
  */
-UndocumentedSite.prototype.runThemeSetup = function( saveExisting, callback ) {
-	return this.wpcom.req.post( `/sites/${ this._id }/theme-setup`, {
-		save_existing: saveExisting
-	}, callback );
+UndocumentedSite.prototype.runThemeSetup = function( saveExisting ) {
+	return this.wpcom.req.post( {
+		path: `/sites/${ this._id }/theme-setup`,
+		body: {
+			save_existing: saveExisting,
+		},
+		apiNamespace: 'wpcom/v2',
+	} );
 };
 
 /**
