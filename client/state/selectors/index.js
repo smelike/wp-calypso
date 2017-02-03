@@ -43,6 +43,7 @@ export getSiteIconId from './get-site-icon-id';
 export getSiteIconUrl from './get-site-icon-url';
 export getTimezonesByContinent from './get-timezones-by-continent';
 export getUpcomingBillingTransactions from './get-upcoming-billing-transactions';
+export getVisibleSites from './get-visible-sites';
 export hasBrokenSiteUserConnection from './has-broken-site-user-connection';
 export isActivatingJetpackJumpstart from './is-activating-jetpack-jumpstart';
 export isActivatingJetpackModule from './is-activating-jetpack-module';
