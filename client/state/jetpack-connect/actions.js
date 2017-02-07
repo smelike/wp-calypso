@@ -220,7 +220,8 @@ export default {
 			externalRedirect(
 				addQueryArgs( {
 					jetpack_connect_url: url + remoteAuthPath,
-					calypso_env: calypsoEnv
+					calypso_env: calypsoEnv,
+					auth_type: 'jetpack'
 				}, apiBaseUrl )
 			);
 		};
