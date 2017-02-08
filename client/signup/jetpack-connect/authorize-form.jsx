@@ -263,12 +263,16 @@ const LoggedInForm = React.createClass( {
 			// Expired secret errors, and XMLRPC errors will be resolved in `handleResolve`.
 			// Any other type of error, we will immediately and automatically retry the request as many times
 			// as controlled by MAX_AUTH_ATTEMPTS.
-			const attempts = this.props.authAttempts || 0;
+			const attempts = props.authAttempts || 0;
 			this.retryingAuth = true;
 			return this.props.retryAuth( queryObject.site, attempts + 1 );
 		}
 		if ( props.isAlreadyOnSitesList && ! queryObject.already_authorized && ! props.isFetchingSites && ! this.retryingAuth ) {
+			const attempts = props.authAttempts || 0;
 			this.retryingAuth = true;
+			if ( attempts < 1 ) {
+				return this.props.retryAuth( queryObject.site, 1 + attempts );
+			}
 			return this.props.goToXmlrpcErrorFallbackUrl( queryObject, authorizationCode );
 		}
 	},

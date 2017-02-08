@@ -28,7 +28,6 @@ import {
 	JETPACK_CONNECT_REDIRECT,
 	JETPACK_CONNECT_REDIRECT_WP_ADMIN,
 	JETPACK_CONNECT_REDIRECT_XMLRPC_ERROR_FALLBACK_URL,
-	JETPACK_CONNECT_RETRY_AUTH,
 	JETPACK_CONNECT_SELECT_PLAN_IN_ADVANCE,
 	JETPACK_CONNECT_SSO_AUTHORIZE_REQUEST,
 	JETPACK_CONNECT_SSO_AUTHORIZE_SUCCESS,
@@ -43,6 +42,8 @@ import addQueryArgs from 'lib/route/add-query-args';
 import { externalRedirect } from 'lib/route/path';
 import { urlToSlug } from 'lib/url';
 import { JPC_PLANS_PAGE } from './constants';
+import { isStale } from './utils';
+import { AUTH_ATTEMPS_TTL } from './constants';
 
 /**
  *  Local variables;
@@ -57,6 +58,23 @@ const tracksEvent = ( dispatch, eventName, props ) => {
 	setTimeout( () => {
 		dispatch( recordTracksEvent( eventName, props ) );
 	}, 1 );
+};
+
+const storeConnectAttempt = ( slug, attemptNumber ) => {
+	const localStorageState = JSON.parse( localStorage.getItem( 'jetpackConnectionAttempts' ) || '{}' );
+	let currentTimestamp = localStorageState[ slug ] ? localStorageState[ slug ].timestamp || Date.now() : Date.now();
+	if ( attemptNumber > 0 ) {
+		const now = Date.now();
+		if ( isStale( currentTimestamp, AUTH_ATTEMPS_TTL ) ) {
+			currentTimestamp = now;
+			attemptNumber = 1;
+		}
+	}
+
+	localStorage.setItem(
+		'jetpackConnectionAttempts',
+		JSON.stringify( Object.assign( {}, localStorageState, { [ slug ]: { attempt: attemptNumber, timestamp: currentTimestamp } } ) )
+	);
 };
 
 export default {
@@ -205,14 +223,11 @@ export default {
 			);
 		};
 	},
+
 	retryAuth( url, attemptNumber ) {
 		return ( dispatch ) => {
 			debug( 'retrying auth', url, attemptNumber );
-			dispatch( {
-				type: JETPACK_CONNECT_RETRY_AUTH,
-				attemptNumber: attemptNumber,
-				slug: urlToSlug( url )
-			} );
+			storeConnectAttempt( urlToSlug( url ), attemptNumber );
 			tracksEvent( dispatch, 'calypso_jpc_retry_auth', {
 				url: url,
 				attempt: attemptNumber
@@ -475,6 +490,7 @@ export default {
 	},
 	completeFlow( site ) {
 		return ( dispatch ) => {
+			localStorage.setItem( 'jetpackConnectionAttempts', {} );
 			dispatch( {
 				type: JETPACK_CONNECT_COMPLETE_FLOW,
 				site

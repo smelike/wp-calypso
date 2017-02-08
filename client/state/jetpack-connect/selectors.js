@@ -87,7 +87,7 @@ const getFlowType = function( state, siteSlug ) {
 };
 
 const getAuthAttempts = ( state, slug ) => {
-	const attemptsData = get( state, [ 'jetpackConnect', 'jetpackAuthAttempts', slug ] );
+	const attemptsData = JSON.parse( localStorage.getItem( 'jetpackConnectionAttempts' ) || '{}' )[ slug ];
 	if ( attemptsData && isStale( attemptsData.timestamp, AUTH_ATTEMPS_TTL ) ) {
 		return 0;
 	}
