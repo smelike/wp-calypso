@@ -101,12 +101,21 @@ class EditorMediaModalDetailPreviewVideoPress extends Component {
 	}
 
 	pause() {
-		const video = this.video.getElementsByTagName( 'video' );
-
-		if ( video.length > 0 ) {
-			video[ 0 ].pause();
-			this.props.onPause( video[ 0 ].currentTime );
+		if ( ! this.player || ! this.player.state ) {
+			return;
 		}
+
+		if ( typeof this.player.state.pause === 'function' ) {
+			this.player.state.pause();
+		}
+
+		let currentTime;
+
+		if ( typeof this.player.state.videoAt === 'function' ) {
+			currentTime = this.player.state.videoAt();
+		}
+
+		this.props.onPause( currentTime );
 	}
 
 	render() {
