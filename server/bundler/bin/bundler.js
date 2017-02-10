@@ -94,7 +94,7 @@ webpack( webpackConfig, function( error, stats ) {
 	files = assets.map( function( chunk ) {
 		return path.join( process.cwd(), 'public', chunk.file );
 	} );
-	files.push( path.join( process.cwd(), 'public', 'vendor.' + bundleEnv + '.js' ) );
+	files.push( path.join( process.cwd(), 'public', 'vendor.js' ) );
 
 	minify( files );
 });
