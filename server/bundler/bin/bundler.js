@@ -89,7 +89,7 @@ webpack( webpackConfig, function( error, stats ) {
 
 	assets = utils.getAssets( stats.toJson() );
 
-	fs.writeFileSync( path.join( __dirname, '..', 'assets-' + CALYPSO_ENV + '.json' ), JSON.stringify( assets, null, '\t' ) );
+	fs.writeFileSync( path.join( __dirname, '..', 'assets.json' ), JSON.stringify( assets, null, '\t' ) );
 
 	files = assets.map( function( chunk ) {
 		return path.join( process.cwd(), 'public', chunk.file );
