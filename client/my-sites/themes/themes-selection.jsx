@@ -141,9 +141,14 @@ const ThemesSelection = React.createClass( {
 } );
 
 const ConnectedThemesSelection = connect(
-	( state, { filter, page, search, tier, vertical, siteId, queryWpcom } ) => {
+	( state, { filter, page, search, tier, vertical, siteId, source } ) => {
 		const isJetpack = isJetpackSite( state, siteId );
-		const siteIdOrWpcom = ( siteId && isJetpack && ! ( queryWpcom === true ) ) ? siteId : 'wpcom';
+		let siteIdOrWpcom;
+		if ( source === 'wpcom' || source === 'wporg' ) {
+			siteIdOrWpcom = source;
+		} else {
+			siteIdOrWpcom = ( siteId && isJetpack ) ? siteId : 'wpcom';
+		}
 
 		const query = {
 			search,
