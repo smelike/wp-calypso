@@ -24,7 +24,7 @@ export class ResetPasswordFormComponent extends Component {
 
 	static propTypes = {
 		translate: PropTypes.func.isRequired,
-		resetOptions: PropTypes.object.isRequired,
+		resetOptions: PropTypes.array.isRequired,
 	};
 
 	state = {
