@@ -34,7 +34,7 @@
       "version": "0.8.1"
     },
     "ajv": {
-      "version": "4.11.2",
+      "version": "4.11.3",
       "dev": true
     },
     "ajv-keywords": {
@@ -454,10 +454,10 @@
       "version": "2.11.0"
     },
     "body-parser": {
-      "version": "1.16.0",
+      "version": "1.16.1",
       "dependencies": {
         "debug": {
-          "version": "2.6.0"
+          "version": "2.6.1"
         },
         "ms": {
           "version": "0.7.2"
@@ -537,7 +537,7 @@
       }
     },
     "caniuse-db": {
-      "version": "1.0.30000622"
+      "version": "1.0.30000623"
     },
     "caseless": {
       "version": "0.11.0"
@@ -758,7 +758,7 @@
       "version": "1.0.2"
     },
     "convert-source-map": {
-      "version": "1.3.0"
+      "version": "1.4.0"
     },
     "cookie": {
       "version": "0.1.2"
@@ -2699,6 +2699,9 @@
     "number-is-nan": {
       "version": "1.0.1"
     },
+    "numeral": {
+      "version": "2.0.4"
+    },
     "nwmatcher": {
       "version": "1.3.9",
       "dev": true
@@ -3754,7 +3757,7 @@
       "version": "1.1.2"
     },
     "symbol-tree": {
-      "version": "3.2.1",
+      "version": "3.2.2",
       "dev": true
     },
     "sync-exec": {
