@@ -12,6 +12,7 @@ import LostPasswordForm from 'account-recovery/lost-password/lost-password-form'
 import ForgotUsernamePage from 'account-recovery/forgot-username';
 import ResetPasswordPage from 'account-recovery/reset-password';
 import ResetPasswordForm from 'account-recovery/reset-password/reset-password-form';
+import ResetPasswordEmailSent from 'account-recovery/reset-password/reset-password-email-sent';
 import TransactionIdForm from 'account-recovery/reset-password/transaction-id-form';
 import { getCurrentUser } from 'state/current-user/selectors';
 
@@ -40,6 +41,16 @@ export function resetPassword( context, next ) {
 	context.primary = (
 		<ResetPasswordPage basePath={ context.path }>
 			<ResetPasswordForm />
+		</ResetPasswordPage>
+	);
+
+	next();
+}
+
+export function resetPasswordEmailSent( context, next ) {
+	context.primary = (
+		<ResetPasswordPage basePath={ context.path }>
+			<ResetPasswordEmailSent />
 		</ResetPasswordPage>
 	);
 
