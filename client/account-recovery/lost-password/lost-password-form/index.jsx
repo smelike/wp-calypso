@@ -92,8 +92,7 @@ export class LostPasswordFormComponent extends Component {
 							value={ userLogin }
 							disabled={ isRequesting } />
 					</FormLabel>
-					<a href="#" className="lost-password-form__forgot-username-link"
-						onClick={ this.props.toForgotUsername } >
+					<a className="lost-password-form__forgot-username-link" onClick={ this.props.toForgotUsername } >
 						{ translate( 'Forgot your username?' ) }
 					</a>
 					<Button
