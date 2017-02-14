@@ -133,3 +133,6 @@ export const onAccountRecoveryPhoneValidationSuccess = ( dispatch ) =>
 
 export const onAccountRecoveryPhoneValidationFailed = ( dispatch ) =>
 	dispatch( errorNotice( translate( 'There was a problem validating your recovery SMS number. Please try again later.' ) ) );
+
+export const onAccountRecoveryResetOptionsError = ( dispatch ) =>
+	dispatch( errorNotice( translate( 'We cannot find the given user. Please check if any typos or try again later.' ) ) );

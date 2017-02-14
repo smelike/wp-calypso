@@ -19,6 +19,7 @@ import {
 	ACCOUNT_RECOVERY_SETTINGS_RESEND_VALIDATION_FAILED,
 	ACCOUNT_RECOVERY_SETTINGS_VALIDATE_PHONE_SUCCESS,
 	ACCOUNT_RECOVERY_SETTINGS_VALIDATE_PHONE_FAILED,
+	ACCOUNT_RECOVERY_RESET_OPTIONS_ERROR,
 	BILLING_RECEIPT_EMAIL_SEND_FAILURE,
 	BILLING_RECEIPT_EMAIL_SEND_SUCCESS,
 	GRAVATAR_RECEIVE_IMAGE_FAILURE,
@@ -61,6 +62,7 @@ import {
 	onResentAccountRecoveryEmailValidationFailed,
 	onAccountRecoveryPhoneValidationSuccess,
 	onAccountRecoveryPhoneValidationFailed,
+	onAccountRecoveryResetOptionsError,
 } from './account-recovery';
 import { onJetpackModuleActivationActionMessage } from './jetpack-modules';
 
@@ -192,6 +194,7 @@ export const handlers = {
 	[ ACCOUNT_RECOVERY_SETTINGS_RESEND_VALIDATION_FAILED ]: onResentAccountRecoveryEmailValidationFailed,
 	[ ACCOUNT_RECOVERY_SETTINGS_VALIDATE_PHONE_SUCCESS ]: onAccountRecoveryPhoneValidationSuccess,
 	[ ACCOUNT_RECOVERY_SETTINGS_VALIDATE_PHONE_FAILED ]: onAccountRecoveryPhoneValidationFailed,
+	[ ACCOUNT_RECOVERY_RESET_OPTIONS_ERROR ]: onAccountRecoveryResetOptionsError,
 	[ BILLING_RECEIPT_EMAIL_SEND_FAILURE ]: dispatchError( translate(
 		'There was a problem sending your receipt. Please try again later or contact support.'
 	) ),
