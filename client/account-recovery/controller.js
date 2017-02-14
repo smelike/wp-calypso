@@ -8,6 +8,7 @@ import page from 'page';
  * Internal dependencies
  */
 import LostPasswordPage from 'account-recovery/lost-password';
+import LostPasswordForm from 'account-recovery/lost-password/lost-password-form';
 import ForgotUsernamePage from 'account-recovery/forgot-username';
 import ResetPasswordPage from 'account-recovery/reset-password';
 import ResetPasswordForm from 'account-recovery/reset-password/reset-password-form';
@@ -19,11 +20,14 @@ const createTransitCallback = ( route ) => {
 };
 
 export const lostPassword = ( routes ) => ( context, next ) => {
-	context.primary = <LostPasswordPage
-		basePath={ context.path }
-		toRestPassword={ createTransitCallback( routes.RESET_PASSWORD ) }
-		toForgotUsername={ createTransitCallback( routes.FORGOT_USERNAME ) }
-	/>;
+	context.primary = (
+		<LostPasswordPage basePath={ context.path }>
+			<LostPasswordForm
+				toResetPassword={ createTransitCallback( routes.RESET_PASSWORD ) }
+				toForgotUsername={ createTransitCallback( routes.FORGOT_USERNAME ) }
+			/>
+		</LostPasswordPage>
+	);
 	next();
 };
 
