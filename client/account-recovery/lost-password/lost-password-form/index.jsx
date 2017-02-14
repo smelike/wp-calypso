@@ -37,7 +37,7 @@ export class LostPasswordFormComponent extends Component {
 		this.setState( { userLogin: event.target.value } );
 	};
 
-	componentWillReceiveProps( nextProps ) {
+	componentWillReceiveProps = ( nextProps ) => {
 		if ( nextProps.isResetOptionsReady ) {
 			this.props.toResetPassword();
 		}
@@ -112,6 +112,8 @@ export class LostPasswordFormComponent extends Component {
 
 LostPasswordFormComponent.defaultProps = {
 	translate: identity,
+	toResetPassword: identity,
+	toForgotUsername: identity,
 	isResetOptionsReady: false,
 	isRequesting: false,
 	fetchResetOptionsByLogin: noop,
