@@ -15,22 +15,21 @@ import Button from 'components/button';
 import FormLabel from 'components/forms/form-label';
 import FormInput from 'components/forms/form-text-input';
 import { fetchResetOptionsByLogin } from 'state/account-recovery/reset/actions';
-import { getAccountRecoveryResetOptions } from 'state/selectors';
+import {
+	isAccountRecoveryResetOptionsReady,
+	isRequestingAccountRecoveryResetOptions,
+} from 'state/selectors';
 
 export class LostPasswordFormComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.state = {
-			isSubmitting: false,
 			userLogin: '',
 		};
 	}
 
 	submitForm = () => {
-		this.setState( { isSubmitting: true } );
-
-		//This is only here to test the redux action and will be replaced in a future PR
 		this.props.fetchResetOptionsByLogin( this.state.userLogin );
 	};
 
@@ -39,15 +38,20 @@ export class LostPasswordFormComponent extends Component {
 	};
 
 	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.resetOptions ) {
-			this.setState( { isSubmitting: false } );
+		if ( nextProps.isResetOptionsReady ) {
+			this.props.toResetPassword();
 		}
 	}
 
 	render() {
-		const { translate } = this.props;
-		const { isSubmitting, userLogin } = this.state;
-		const isPrimaryButtonDisabled = ! userLogin || isSubmitting;
+		const {
+			isRequesting,
+			translate,
+		} = this.props;
+
+		const { userLogin } = this.state;
+
+		const isPrimaryButtonDisabled = ! userLogin || isRequesting;
 
 		return (
 			<div>
@@ -86,9 +90,10 @@ export class LostPasswordFormComponent extends Component {
 							className="lost-password-form__user-login-input"
 							onChange={ this.onUserLoginChanged }
 							value={ userLogin }
-							disabled={ isSubmitting } />
+							disabled={ isRequesting } />
 					</FormLabel>
-					<a href="/account-recovery/forgot-username" className="lost-password-form__forgot-username-link">
+					<a href="#" className="lost-password-form__forgot-username-link"
+						onClick={ this.props.toForgotUsername } >
 						{ translate( 'Forgot your username?' ) }
 					</a>
 					<Button
@@ -107,12 +112,15 @@ export class LostPasswordFormComponent extends Component {
 
 LostPasswordFormComponent.defaultProps = {
 	translate: identity,
+	isResetOptionsReady: false,
+	isRequesting: false,
 	fetchResetOptionsByLogin: noop,
 };
 
 export default connect(
 	( state ) => ( {
-		resetOptions: getAccountRecoveryResetOptions( state ),
+		isResetOptionsReady: isAccountRecoveryResetOptionsReady( state ),
+		isRequesting: isRequestingAccountRecoveryResetOptions( state ),
 	} ),
 	{ fetchResetOptionsByLogin }
 )( localize( LostPasswordFormComponent ) );

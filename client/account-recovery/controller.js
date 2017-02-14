@@ -14,10 +14,18 @@ import ResetPasswordForm from 'account-recovery/reset-password/reset-password-fo
 import TransactionIdForm from 'account-recovery/reset-password/transaction-id-form';
 import { getCurrentUser } from 'state/current-user/selectors';
 
-export function lostPassword( context, next ) {
-	context.primary = <LostPasswordPage basePath={ context.path } />;
+const createTransitCallback = ( route ) => {
+	return () => page( route );
+};
+
+export const lostPassword = ( routes ) => ( context, next ) => {
+	context.primary = <LostPasswordPage
+		basePath={ context.path }
+		toRestPassword={ createTransitCallback( routes.RESET_PASSWORD ) }
+		toForgotUsername={ createTransitCallback( routes.FORGOT_USERNAME ) }
+	/>;
 	next();
-}
+};
 
 export function forgotUsername( context, next ) {
 	context.primary = <ForgotUsernamePage basePath={ context.path } />;
