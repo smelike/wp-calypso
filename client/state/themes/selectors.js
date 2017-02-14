@@ -67,6 +67,23 @@ export const getTheme = createSelector(
 	( state ) => state.themes.queries
 );
 
+export function getThemeInfoFromOriginalSource( state, siteId, themeId ) {
+	// Check WP.com first since it has the richest information (long description,
+	// multiple screenshots, etc).
+	if ( isWpcomTheme( state, themeId ) ) {
+		return getTheme( state, 'wpcom', themeId );
+	}
+
+	// Check WP.org next since it has still more information than an individual
+	// Jetpack site (e.g. preview URL).
+	if ( isWporgTheme( state, themeId ) ) {
+		return getTheme( state, 'wporg', themeId );
+	}
+
+	// Fall back to Jetpack site.
+	return getTheme( state, siteId, themeId );
+}
+
 /**
  * When wpcom themes are installed on Jetpack sites, the
  * theme id is suffixed with -wpcom. Some operations require
