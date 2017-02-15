@@ -603,3 +603,15 @@ export function isThemePurchased( state, themeId, siteId ) {
 	const sitePurchases = getSitePurchases( state, siteId );
 	return some( sitePurchases, { productSlug: 'premium_theme', meta: themeId } );
 }
+
+/**
+ * Returns id of the parent theme, if any, for a wpcom theme.
+ *
+ * @param {Object} state Global state tree
+ * @param {string} themeId Child theme ID
+ *
+ * @return {?string} Parent theme id if it exists
+ */
+export function getWpcomParentThemeId( state, themeId ) {
+	return get( getTheme( state, 'wpcom', themeId ), [ 'template' ], null );
+}
