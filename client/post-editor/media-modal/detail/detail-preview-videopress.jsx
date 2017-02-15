@@ -14,6 +14,7 @@ import loadScript from 'lib/load-script';
  * Module variables
  */
 const log = debug( 'calypso:post-editor:videopress' );
+const videoPressUrl = 'https://wordpress.com/wp-content/plugins/video/assets/js/next/videopress.js';
 
 class EditorMediaModalDetailPreviewVideoPress extends Component {
 	static propTypes = {
@@ -38,6 +39,7 @@ class EditorMediaModalDetailPreviewVideoPress extends Component {
 	}
 
 	componentWillUnmount() {
+		loadScript.removeScriptCallback( videoPressUrl, this.onScriptLoaded );
 		this.destroy();
 	}
 
@@ -69,7 +71,7 @@ class EditorMediaModalDetailPreviewVideoPress extends Component {
 	setVideoInstance = ref => this.video = ref;
 
 	loadInitializeScript() {
-		loadScript.loadScript( 'https://wordpress.com/wp-content/plugins/video/assets/js/next/videopress.js', this.onScriptLoaded );
+		loadScript.loadScript( videoPressUrl, this.onScriptLoaded );
 	}
 
 	onScriptLoaded( error ) {
