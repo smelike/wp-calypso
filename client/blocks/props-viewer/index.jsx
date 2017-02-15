@@ -59,6 +59,14 @@ class PropsViewer extends PureComponent {
 		} );
 	};
 
+	componentWillMount() {
+		this.setComponent( this.props.component );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		this.setComponent( nextProps.component );
+	}
+
 	/**
 	 * Sort prop names by (required, name)
 	 * @param {string} leftName The prop name of the left side
@@ -147,8 +155,6 @@ class PropsViewer extends PureComponent {
 		if ( ! component ) {
 			return null; //todo: explain why this table is missing
 		}
-
-		this.setComponent( this.props.component );
 
 		return (
 			<Card compact={ true } className="props-viewer__card" tagName="div">
