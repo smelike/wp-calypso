@@ -9,7 +9,7 @@ import useMockery from 'test/helpers/use-mockery';
 describe( 'PropsViewer', () => {
 	let PropsViewer;
 	useMockery( ( mockery ) => {
-		mockery.registerSubstitute( '../../../server/devdocs/proptypes-index.json', './proptypes-index-mock.json' );
+		mockery.registerSubstitute( '../../../server/devdocs/proptypes-index.json', './test/proptypes-index-mock.json' );
 		PropsViewer = require( '../index' );
 	} );
 
