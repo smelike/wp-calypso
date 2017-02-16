@@ -144,7 +144,7 @@ export function requestThemes( siteId, query = {} ) {
 				// So we have to filter on the client side.
 				// Also if Jetpack plugin has Themes Extended Features,
 				// we filter out -wpcom suffixed themes because we will show them in
-				// second list that is specific to WorpPress.com themes.
+				// second list that is specific to WordPress.com themes.
 				const keepWpcom = ! config.isEnabled( 'manage/themes/upload' ) ||
 					! hasJetpackSiteJetpackThemesExtendedFeatures( getState(), siteId );
 
@@ -415,7 +415,7 @@ export function themeActivated( themeStylesheet, siteId, source = 'unknown', pur
  * @return {Function}         Action thunk
  */
 export function installTheme( themeId, siteId ) {
-	return ( dispatch ) => {
+	return ( dispatch, getState ) => {
 		dispatch( {
 			type: THEME_INSTALL,
 			siteId,
@@ -424,7 +424,16 @@ export function installTheme( themeId, siteId ) {
 
 		return wpcom.undocumented().installThemeOnJetpack( siteId, themeId )
 			.then( ( theme ) => {
-				dispatch( receiveTheme( theme, siteId ) );
+				// If Jetpack plugin has Themes Extended Features,
+				// we filter out -wpcom suffixed themes because we will show them in
+				// second list that is specific to WordPress.com themes.
+				const keepWpcom = ! config.isEnabled( 'manage/themes/upload' ) ||
+					! hasJetpackSiteJetpackThemesExtendedFeatures( getState(), siteId );
+
+				if ( keepWpcom || ! isThemeFromWpcom( theme.id ) ) {
+					dispatch( receiveTheme( theme, siteId ) );
+				}
+
 				dispatch( {
 					type: THEME_INSTALL_SUCCESS,
 					siteId,
